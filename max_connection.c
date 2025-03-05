@@ -1,7 +1,7 @@
 const int FSR_PINS[9] = {A0, A1, A2, A3, A4, 5, 6, 7, 8};
 int new_package[9] = {0}, old_package[9] = {0};
 
-const int THRESHOLD = 350;
+const int THRESHOLD = 150;
 
 const unsigned long SENSOR_INTERVAL = 50;
 unsigned long previousMillis = 0;
@@ -9,11 +9,12 @@ unsigned long previousMillis = 0;
 const unsigned long DEBOUNCE_DELAY = 400;
 unsigned long lastDebounceTime[9] = {0};
 
-const int SENSOR_CAP = 1;
+const int START_SENSOR = 0;
+const int NUM_SENSORS = 2;
 
 void setup() {
   Serial.begin(9600);
-  for (int i = 0; i < SENSOR_CAP; i++) {
+  for (int i = START_SENSOR; i < NUM_SENSORS + START_SENSOR; i++) {
     pinMode(FSR_PINS[i], INPUT);
   }
   pinMode(LED_BUILTIN, OUTPUT);
@@ -24,14 +25,14 @@ void loop() {
 
   unsigned long currentMillis = millis();
   
-  for (int i = 0; i < SENSOR_CAP; i++) {
+  for (int i = START_SENSOR; i < NUM_SENSORS + START_SENSOR; i++) {
     old_package[i] = new_package[i];
   }
 
   if (currentMillis - previousMillis >= SENSOR_INTERVAL) {
     previousMillis = currentMillis;  // Reset timer
 
-    for (int i = 0; i < SENSOR_CAP; i++) {
+    for (int i = START_SENSOR; i < NUM_SENSORS + START_SENSOR; i++) {
       int reading = analogRead(FSR_PINS[i]);  // Read each sensor
       int new_state = (reading > THRESHOLD) ? 1 : 0;
 
@@ -49,7 +50,7 @@ void loop() {
 }
 
 void check_change(int new_package[9], int old_package[9]) {
-  for (int i = 0; i < SENSOR_CAP; i++) {
+  for (int i = START_SENSOR; i < NUM_SENSORS + START_SENSOR; i++) {
     if (new_package[i] != old_package[i]) {
       if (new_package[i] == 1) {
         Serial.print(i + 1); // print 1-9 as changed value
