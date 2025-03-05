@@ -7,15 +7,16 @@ const unsigned long SENSOR_INTERVAL = 50;
 unsigned long previousMillis = 0;
 
 const unsigned long DEBOUNCE_DELAY = 400;
-unsigned long lastDebounceTime[9] = {0}; 
+unsigned long lastDebounceTime[9] = {0};
 
-const int SENSOR_CAP = 2;
+const int SENSOR_CAP = 1;
 
 void setup() {
   Serial.begin(9600);
   for (int i = 0; i < SENSOR_CAP; i++) {
     pinMode(FSR_PINS[i], INPUT);
   }
+  pinMode(LED_BUILTIN, OUTPUT);
   delay(1000);
 }
 
@@ -45,13 +46,17 @@ void loop() {
   }
 
   check_change(new_package, old_package);
-
 }
 
 void check_change(int new_package[9], int old_package[9]) {
   for (int i = 0; i < SENSOR_CAP; i++) {
     if (new_package[i] != old_package[i]) {
-      Serial.println(i + 1); // print 1-9 as changed value
+      if (new_package[i] == 1) {
+        Serial.print(i + 1); // print 1-9 as changed value
+        digitalWrite(LED_BUILTIN, HIGH);
+      } else {
+        digitalWrite(LED_BUILTIN, LOW);
+      }
     }
   }
 }
